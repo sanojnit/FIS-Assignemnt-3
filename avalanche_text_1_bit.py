@@ -28,6 +28,7 @@ n=p_text
 dd=1
 N=64
 count=0
+bit_count=0
 for j in range(1,65):
     for i in range(1,65):
         count=count+1
@@ -38,7 +39,7 @@ for j in range(1,65):
         p_text = b | c
         print("Random bit stream generated:",bin(p_text))
         ciphertext2 = des.encrypt(p_text.to_bytes(8, 'little'))
-        no_bits_changed=bin(p_text).count("1")
+        no_bits_changed=bin(p_text).count("1")-bit_count
         change_bits.append(no_bits_changed)
         print("No. of bits changed in plain the text :",no_bits_changed )
         xor_txt=int.from_bytes(ciphertext1, 'little')^int.from_bytes(ciphertext2, 'little')
@@ -57,6 +58,12 @@ for j in range(1,65):
         if j==64 and i==1:
             print("Final count:",count)
             break
+        if i==64:
+            ciphertext1=ciphertext2
+            decrypted_text=des.decrypt(ciphertext2)
+            iptext=bin(int.from_bytes(decrypted_text, 'little'))
+            bit_count=iptext.count("1")
+            print("Decrypted Text :",iptext)
         print("Locations of Avalanche Effect :",location)
 
         print("\n----------------")
@@ -101,6 +108,7 @@ n=p_text
 dd=1
 N=64
 count=0
+bit_count=0
 for j in range(1,65):
     for i in range(1,65):
         count=count+1
@@ -111,7 +119,7 @@ for j in range(1,65):
         p_text = b | c
         print("Random bit stream generated:",bin(p_text))
         ciphertext2 = msg = cipher.encrypt(p_text.to_bytes(8, 'little'))
-        no_bits_changed=bin(p_text).count("1")
+        no_bits_changed=bin(p_text).count("1")-bit_count
 
         des3_change_bits.append(no_bits_changed)
         print("No. of bits changed in plain the text :",no_bits_changed )
@@ -134,6 +142,16 @@ for j in range(1,65):
         if j==64 and i==1:
             print("Final count:",count)
             break
+        if i==64:
+            ciphertext1=ciphertext2
+            cipher_decrypt = DES3.new(key, DES3.MODE_ECB)
+            decrypted_text=cipher_decrypt.decrypt(ciphertext2)
+
+
+
+            iptext=bin(int.from_bytes(decrypted_text, 'little'))
+            bit_count=iptext.count("1")
+            print("Decrypted Text :",iptext)
         n=p_text
     print("Loop count................................................................................",count)
     p_text=p_text<<1
@@ -147,7 +165,7 @@ print("Final count",count)
 
 df = pd.DataFrame(data, columns=['No of Bits Changed in the Plain Text - DES ','No of bits changed in the Cipher Text - DES'])
 df2 = pd.DataFrame(des3_data, columns=['No of Bits Changed in the Plain Text - 3DES ','No of bits changed in the Cipher Text - 3DES'])
-with pd.ExcelWriter('AVALANCHE_TEXT.xlsx') as writer:
+with pd.ExcelWriter('ONE_TEXT.xlsx') as writer:
     df.to_excel(writer, sheet_name='Avalanche(Text) DES')
     df2.to_excel(writer, sheet_name='Avalanche(Text) 3DES')
 
